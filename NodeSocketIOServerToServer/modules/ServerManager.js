@@ -5,19 +5,22 @@
 const HashMap = require('hashmap');
 const DistServer = require('./DistServer');
 
+const Redis = require('ioredis');
+const redis = new Redis(6379, '127.0.0.1');
+
 class ServerManager {
     constructor(io) {
         const servman = this;
 
         this.io = io;
-        //  ??? ?????? HashMap ????
+        // Child Server Map
         this.chServMap = new HashMap();
 
-        //  ?? ??? ?????? ??? ???? ???
+        // All Users Map
         this.users = new HashMap();
 
         io.on('connection', function(socket) {
-            //  ??? ???? ???
+            // Child Server Connected
             servman.addServer(socket);
         });
 
@@ -28,8 +31,6 @@ class ServerManager {
 
     addServer( socket ) {
         const servman = this;
-
-        //  ???? ?????? ????? ????? ???? ????? ???.
         console.log(`child server connected -  `);
         servman.chServMap.set(this.id, new DistServer(servman, socket) );
 

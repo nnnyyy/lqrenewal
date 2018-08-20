@@ -15,6 +15,9 @@ const session = require('express-session');
 const sharedsession = require("express-socket.io-session");
 const routes = require('./routes/index');
 
+const Redis = require('ioredis');
+const redis = new Redis(6379, '127.0.0.1');
+
 let port = normalizePort(process.env.PORT || '4000');
 let before = '';
 process.argv.forEach(function(val, idx, arr) {
@@ -59,7 +62,8 @@ app.use('/', routes);
 
 io.on('connection', function( socket ) {
     //  ���� ����
-    console.log('user connected');
+    console.log(`${socket.handshake.session.name} user connected`);
+
     socketToCenterServer.emit('conn-user', {sockid: socket.id});
     socketToCenterServer.on('conn-count', function(packet) {
         io.sockets.emit('conn-count', packet);
