@@ -6,8 +6,14 @@
 <script src="/socket.io/socket.io.js"></script>
 <body>
 Test Server!
+<div id="cnt">0</div>
 </body>
 <script>
-    var socket = io();
+    $(document).ready(function() {
+        var socket = io();
+        socket.on('conn-count', function(packet) {
+            $('#cnt').text(packet.cnt);
+        });
+    });
 </script>
 </html>

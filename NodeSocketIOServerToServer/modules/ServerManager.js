@@ -7,20 +7,33 @@ const DistServer = require('./DistServer');
 
 class ServerManager {
     constructor(io) {
+        const servman = this;
+
+        this.io = io;
+        //  자식 서버들 HashMap 초기화
         this.chServMap = new HashMap();
 
-        const servman = this;
+        //  각 자식 서버의 모든 유저 목록
+        this.users = new HashMap();
+
         io.on('connection', function(socket) {
             //  자식 서버 추가
             servman.addServer(socket);
         });
+
+        setInterval(function() {
+            servman.io.sockets.emit('conn-count', {cnt: servman.users.count()});
+        }, 400);
     }
 
     addServer( socket ) {
         const servman = this;
+
+        //  서버 정보를 받고나면 확실히 서버 등록을 한다.
+        console.log(`child server connected -  `);
+        servman.chServMap.set(this.id, new DistServer(servman, socket) );
+
         socket.on('serv-info', function(packet) {
-            console.log(`child server connected -  name : ${packet.name}, port ${packet.port}`);
-            servman.chServMap.set(this.id, new DistServer(this, packet.name, packet.port) );
         })
 
         socket.on('disconnect', function() {
@@ -34,8 +47,16 @@ class ServerManager {
 
     removeServer( socket ) {
         let distServer = this.chServMap.get( socket.id );
-        console.log(`child server disconnected - ${distServer.name} : ${distServer.port}`);
+        console.log(`child server disconnected - `);
         this.chServMap.delete(socket.id);
+    }
+
+    addUser(sockid, client) {
+        this.users.set(sockid, client);
+    }
+
+    removeUser(sockid) {
+        this.users.delete(sockid);
     }
 }
 

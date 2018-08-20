@@ -55,9 +55,14 @@ io.on('connection', function( socket ) {
     //  유저 접속
     console.log('user connected');
     socketToCenterServer.emit('conn-user', {sockid: socket.id});
+    socketToCenterServer.on('conn-count', function(packet) {
+        io.sockets.emit('conn-count', packet);
+    })
+
     socket.on('disconnect', function() {
         socketToCenterServer.emit('disconn-user', {sockid: this.id});
     })
+
 })
 
 http.listen(port, function() {
