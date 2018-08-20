@@ -10,14 +10,14 @@ class ServerManager {
         const servman = this;
 
         this.io = io;
-        //  자식 서버들 HashMap 초기화
+        //  ??? ?????? HashMap ????
         this.chServMap = new HashMap();
 
-        //  각 자식 서버의 모든 유저 목록
+        //  ?? ??? ?????? ??? ???? ???
         this.users = new HashMap();
 
         io.on('connection', function(socket) {
-            //  자식 서버 추가
+            //  ??? ???? ???
             servman.addServer(socket);
         });
 
@@ -29,7 +29,7 @@ class ServerManager {
     addServer( socket ) {
         const servman = this;
 
-        //  서버 정보를 받고나면 확실히 서버 등록을 한다.
+        //  ???? ?????? ????? ????? ???? ????? ???.
         console.log(`child server connected -  `);
         servman.chServMap.set(this.id, new DistServer(servman, socket) );
 

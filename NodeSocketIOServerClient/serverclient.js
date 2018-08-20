@@ -11,10 +11,12 @@ const http = require('http').Server(app);
 const io = require("socket.io")(http);
 const cookieParser = require('cookie-parser');
 const bodyParser = require('body-parser');
-var session = require('express-session');
+const session = require('express-session');
+const sharedsession = require("express-socket.io-session");
+const routes = require('./routes/index');
 
-var port = normalizePort(process.env.PORT || '4000');
-var before = '';
+let port = normalizePort(process.env.PORT || '4000');
+let before = '';
 process.argv.forEach(function(val, idx, arr) {
     console.log(idx + ': ' + val);
     if( before == '-p') {
@@ -46,14 +48,17 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
-var router = express.Router();
-router.get('/', function(req,res, next) {
-   res.render('index', {});
+var sessionMiddleware = session({
+    secret: 'dhkddPtlr',
+    resave: false,
+    saveUninitialized: true
 });
-app.use('/', router);
+app.use(sessionMiddleware);
+io.use(sharedsession(sessionMiddleware));
+app.use('/', routes);
 
 io.on('connection', function( socket ) {
-    //  À¯Àú Á¢¼Ó
+    //  ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
     console.log('user connected');
     socketToCenterServer.emit('conn-user', {sockid: socket.id});
     socketToCenterServer.on('conn-count', function(packet) {
