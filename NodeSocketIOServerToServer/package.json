@@ -1,6 +1,7 @@
 {
   "dependencies": {
     "express": "^4.16.3",
+    "hashmap": "^2.3.0",
     "http": "0.0.0",
     "socket.io": "^2.1.1"
   }

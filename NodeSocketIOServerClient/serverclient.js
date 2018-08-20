@@ -12,9 +12,29 @@ const io = require("socket.io")(http);
 const cookieParser = require('cookie-parser');
 const bodyParser = require('body-parser');
 
+var port = normalizePort(process.env.PORT || '4000');
+var before = '';
+process.argv.forEach(function(val, idx, arr) {
+    console.log(idx + ': ' + val);
+    if( before == '-p') {
+        port = val;
+    }
+
+    if( before =='-name') {
+        config.serv_name = val;
+    }
+
+    if( before =='-mode') {
+        config.mode = val;
+    }
+
+    before = val;
+})
+
+
 // Add a connect listener
 socketToCenterServer.on('connect', function () {
-    this.emit('serv-info', {name: 'ch01'});
+    this.emit('serv-info', {name: 'ch01', port: port});
 });
 
 app.set('views', path.join(__dirname, 'views'));
@@ -40,8 +60,25 @@ io.on('connection', function( socket ) {
     })
 })
 
-http.listen(4000, function() {
-    console.log('listening on *:4000');
+http.listen(port, function() {
+    console.log(`listening on *:${port}`);
 });
+
+
+function normalizePort(val) {
+    var port = parseInt(val, 10);
+
+    if (isNaN(port)) {
+        // named pipe
+        return val;
+    }
+
+    if (port >= 0) {
+        // port number
+        return port;
+    }
+
+    return false;
+}
 
 
