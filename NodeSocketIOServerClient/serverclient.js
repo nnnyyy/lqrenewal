@@ -31,6 +31,13 @@ router.get('/', function(req,res, next) {
 });
 app.use('/', router);
 
+io.on('connection', function( socket ) {
+    //  유저 접속
+    console.log('user connected');
+})
+
 http.listen(4000, function() {
     console.log('listening on *:4000');
 });
+
+
