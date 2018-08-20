@@ -11,6 +11,7 @@ const http = require('http').Server(app);
 const io = require("socket.io")(http);
 const cookieParser = require('cookie-parser');
 const bodyParser = require('body-parser');
+var session = require('express-session');
 
 var port = normalizePort(process.env.PORT || '4000');
 var before = '';
