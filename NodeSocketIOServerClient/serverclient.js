@@ -2,7 +2,7 @@
  * Created by nnnyy on 2018-08-20.
  */
 const ioclient = require('socket.io-client');
-var socket = ioclient.connect('http://localhost:3000', {reconnect: true });
+var socketToCenterServer = ioclient.connect('http://localhost:3000', {reconnect: true });
 
 const express = require("express");
 const app = express();
@@ -13,8 +13,8 @@ const cookieParser = require('cookie-parser');
 const bodyParser = require('body-parser');
 
 // Add a connect listener
-socket.on('connect', function (socket) {
-    console.log('Connected!');
+socketToCenterServer.on('connect', function () {
+    this.emit('serv-info', {name: 'ch01'});
 });
 
 app.set('views', path.join(__dirname, 'views'));
@@ -34,6 +34,10 @@ app.use('/', router);
 io.on('connection', function( socket ) {
     //  유저 접속
     console.log('user connected');
+    socketToCenterServer.emit('conn-user', {sockid: socket.id});
+    socket.on('disconnect', function() {
+        socketToCenterServer.emit('disconn-user', {sockid: this.id});
+    })
 })
 
 http.listen(4000, function() {
