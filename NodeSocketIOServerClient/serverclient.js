@@ -14,9 +14,9 @@ const bodyParser = require('body-parser');
 const session = require('express-session');
 const sharedsession = require("express-socket.io-session");
 const routes = require('./routes/index');
-
-const Redis = require('ioredis');
-const redis = new Redis(6379, '127.0.0.1');
+const redis = require('redis');
+const redisStore = require('connect-redis')(session);
+const client = redis.createClient();
 
 let port = normalizePort(process.env.PORT || '4000');
 let before = '';
@@ -53,8 +53,15 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 var sessionMiddleware = session({
     secret: 'dhkddPtlr',
-    resave: false,
-    saveUninitialized: true
+    resave: true,
+    saveUninitialized: false,
+    store: new redisStore({
+        host: '127.0.0.1',
+        port: 6379,
+        client: client,
+        prefix: "session:",
+        db: 0
+    })
 });
 app.use(sessionMiddleware);
 io.use(sharedsession(sessionMiddleware));
@@ -62,7 +69,7 @@ app.use('/', routes);
 
 io.on('connection', function( socket ) {
     //  ���� ����
-    console.log(`${socket.handshake.session.name} user connected`);
+    console.log(`${socket.handshake.session.username} user connected`);
 
     socketToCenterServer.emit('conn-user', {sockid: socket.id});
     socketToCenterServer.on('conn-count', function(packet) {

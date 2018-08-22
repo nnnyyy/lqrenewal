@@ -6,8 +6,6 @@ const router = express.Router();
 const Auth = require('./auth');
 
 router.use(function(req,res,next) {
-    console.log('redis setup');
-    req.redis = redis;
     next();
 });
 
